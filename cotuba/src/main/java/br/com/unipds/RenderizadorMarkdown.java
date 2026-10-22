@@ -7,65 +7,61 @@ import org.commonmark.node.Text;
 import org.commonmark.parser.Parser;
 import org.commonmark.renderer.html.HtmlRenderer;
 
-import java.io.IOException;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.PathMatcher;
 import java.util.List;
-import java.util.stream.Stream;
 
 public class RenderizadorMarkdown {
 
-    public List<String> renderizar(Path diretorioMD) {
+    public List<Capitulo> renderizar(Path diretorioMDs) {
 
-        PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:**/*.md");
+            var repositorioMarkdowns = new RepositorioMarkDowns();
+            List<Capitulo> capitulos = repositorioMarkdowns.buscarArquivosMD(diretorioMDs);
 
-        try (Stream<Path> streamMDs = Files.list(diretorioMD)) {
-            List<Path> arquivosMD = streamMDs
-                    .filter(matcher::matches)
-                    .sorted()
-                    .toList();
+            return capitulos.stream().map(arquivoMD -> {
 
-            if (arquivosMD.isEmpty()) {
-                throw new IllegalStateException("Não foram encontrados capítulos (arquivos .md) no diretório: "
-                        + diretorioMD.toAbsolutePath());
-            }
-            return arquivosMD.stream().map(arquivoMD -> {
+                var capitulo = new Capitulo();
+
                 Parser parser = Parser.builder().build();
                 Node document = null;
                 try {
-                    document = parser.parseReader(Files.newBufferedReader(arquivoMD));
+                    // Obtém o Markdown do objeto recebido pelo Stream
+                    String markdown = arquivoMD.getMarkdown();
+
+                    document = parser.parse(markdown);
+
                     document.accept(new AbstractVisitor() {
                         @Override
                         public void visit(Heading heading) {
                             if (heading.getLevel() == 1) {
                                 // capítulo
                                 String tituloDoCapitulo = ((Text) heading.getFirstChild()).getLiteral();
-                                // TODO: usar título do capítulo
+                                capitulo.setTitulo(tituloDoCapitulo);
                             } else if (heading.getLevel() == 2) {
                                 // seção
                             } else if (heading.getLevel() == 3) {
                                 // título
                             }
-                        }
 
+                            // Permite percorrer os nós filhos do título, possibilitando o processamento de outros
+                            // elementos do Markdown.
+                            visitChildren(heading);
+                        }
                     });
                 } catch (Exception ex) {
-                    throw new IllegalStateException("Erro ao fazer parse do arquivo " + arquivoMD, ex);
+                    throw new IllegalStateException("Erro ao fazer parse do arquivo "
+                            + capitulo.getArquivoMarkdown(), ex);
                 }
 
                 try {
                     HtmlRenderer renderer = HtmlRenderer.builder().build();
-                    return renderer.render(document);
+                    String html = renderer.render(document);
+                    capitulo.setHtml(html);
+
+                    return capitulo;
                 } catch (Exception ex) {
-                    throw new IllegalStateException("Erro ao renderizar para HTML o arquivo " + arquivoMD, ex);
+                    throw new IllegalStateException("Erro ao renderizar para HTML o arquivo "
+                            + capitulo.getArquivoMarkdown(), ex);
                 }
             }).toList();
-
-        } catch (IOException ex) {
-            throw new IllegalStateException("Erro tentando encontrar arquivos .md em " + diretorioMD
-                    .toAbsolutePath(), ex);
-        }
     }
 }
