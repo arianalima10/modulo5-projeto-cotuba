@@ -1,5 +1,7 @@
 package br.com.unipds;
 
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Named;
 import nl.siegmann.epublib.domain.Author;
 import nl.siegmann.epublib.domain.Book;
 import nl.siegmann.epublib.domain.GuideReference;
@@ -16,9 +18,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-public class GeradorDeEPUB {
+@ApplicationScoped @Named("geradorDeEPUB")
+public class GeradorDeEPUB implements GeradorEbook {
 
-    public void gerarEPUB(Ebook ebook) {
+    public void gerar(Ebook ebook) {
 
         List<Capitulo> capitulos = ebook.getCapitulos();
         Path arquivoSaida = ebook.getArquivoSaida();
