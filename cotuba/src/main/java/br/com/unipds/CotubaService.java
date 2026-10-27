@@ -1,6 +1,8 @@
 package br.com.unipds;
 
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.inject.Any;
+import jakarta.enterprise.inject.Instance;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 
@@ -13,18 +15,15 @@ public class CotubaService { // Essa classe será controlada pelo CDI
     private final RenderizadorMarkdown renderizadorMarkdown;
     private final LeitorPropriedadesEbook leitorPropriedadesEbook;
     private final RepositorioMarkDowns repositorioMarkdowns;
-    private final GeradorEbook geradorDePDF;
-    private final GeradorEbook geradorDeEPUB;
+    private final Instance<GeradorEbook> geradororesEbook;
 
     @Inject
     public CotubaService(RenderizadorMarkdown renderizadorMarkdown, LeitorPropriedadesEbook leitorPropriedadesEbook,
-                         RepositorioMarkDowns repositorioMarkdowns, @Named("geradorDePDF") GeradorEbook geradorDePDF,
-                         @Named("geradorDeEPUB") GeradorEbook geradorDeEPUB) {
+                         RepositorioMarkDowns repositorioMarkdowns, @Any Instance<GeradorEbook> geradororesEbook) {
         this.renderizadorMarkdown = renderizadorMarkdown;
         this.leitorPropriedadesEbook = leitorPropriedadesEbook;
         this.repositorioMarkdowns = repositorioMarkdowns;
-        this.geradorDePDF = geradorDePDF;
-        this.geradorDeEPUB = geradorDeEPUB;
+        this.geradororesEbook = geradororesEbook;
     }
 
     public void executar(ParametrosCotuba parametrosCotuba) {
@@ -43,15 +42,8 @@ public class CotubaService { // Essa classe será controlada pelo CDI
         ebook.setFormato(parametrosCotuba.getFormato());
         ebook.setArquivoSaida(parametrosCotuba.getArquivoDeSaida());
 
-        GeradorEbook geradorEbook;
-
-        if (FormatoEbook.PDF.equals(ebook.getFormato())) {
-            geradorEbook = geradorDePDF;
-        } else if (FormatoEbook.EPUB.equals(ebook.getFormato())) {
-            geradorEbook = geradorDeEPUB;
-        } else {
-            throw new IllegalArgumentException("Formato do ebook inválido: " + parametrosCotuba.getFormato());
-        }
+        FormatoEbook formato = ebook.getFormato();
+        GeradorEbook geradorEbook = geradororesEbook.select(FormatoEbookFilter.of(formato)).get();
 
         geradorEbook.gerar(ebook);
     }
