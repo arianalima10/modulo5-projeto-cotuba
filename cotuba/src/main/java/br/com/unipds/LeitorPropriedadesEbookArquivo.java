@@ -14,9 +14,9 @@ import java.util.Properties;
 public class LeitorPropriedadesEbookArquivo implements LeitorPropriedadesEbook {
 
     @Override
-    public void ler(Path diretorioMD, Ebook ebook) {
+    public PropriedadesEbook ler(Path diretorioMD) {
 
-        Path arquivoProperties = diretorioMD.resolve("ebook.properties");
+        Path arquivoProperties = diretorioMD.resolve("ebookBuilder.properties");
 
         if (!Files.exists(arquivoProperties)) {
             throw new IllegalStateException("Arquivo ebook.properties não encontrado em: " + diretorioMD);
@@ -35,7 +35,7 @@ public class LeitorPropriedadesEbookArquivo implements LeitorPropriedadesEbook {
 
         /**
          * O método load(InputStream) interpreta os bytes usando ISO-8859-1.
-         * Para ler o arquivo ebook.properties em UTF-8, troquei o InputStream por um Reader, que usa
+         * Para ler o arquivo ebookBuilder.properties em UTF-8, troquei o InputStream por um Reader, que usa
          * StandardCharsets.UTF_8, preservando os caracteres acentuados.
          * try (InputStream input = Files.newInputStream(arquivoProperties)) {
          *   // Esse método por ser muito antigo ele não tem retorno e sim muda o status do objeto;
@@ -45,16 +45,15 @@ public class LeitorPropriedadesEbookArquivo implements LeitorPropriedadesEbook {
          * }
          */
 
-        String propriedadeTitulo = "cotuba.ebook.titulo";
+        String propriedadeTitulo = "cotuba.ebookBuilder.titulo";
         String titulo = prop.getProperty(propriedadeTitulo);
         validarPropriedade(titulo, propriedadeTitulo);
 
-        String propriedadeAutor = "cotuba.ebook.autor";
+        String propriedadeAutor = "cotuba.ebookBuilder.autor";
         String autor = prop.getProperty(propriedadeAutor);
         validarPropriedade(autor, propriedadeAutor);
 
-        ebook.setTitulo(titulo);
-        ebook.setAutor(autor);
+       return new PropriedadesEbook(titulo, autor);
     }
 
     private void validarPropriedade(String valor, String propriedade) {

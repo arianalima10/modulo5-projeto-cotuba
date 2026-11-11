@@ -16,13 +16,13 @@ public class GeradorHTML implements GeradorEbook {
 
     @Override
     public void gerar(Ebook ebook) {
-        Path arquivoSaida = ebook.getArquivoSaida();
+        Path arquivoSaida = ebook.arquivoSaida();
         try {
             Path diretorioHTML = Files.createDirectories(arquivoSaida);
 
             int i=1;
             Map<Capitulo, Path> mapHtmlDoCapitulo = new LinkedHashMap<>();
-            for(Capitulo capitulo : ebook.getCapitulos()) {
+            for(Capitulo capitulo : ebook.capitulos()) {
                 String nomeArquivoHTML = obterNomeArquivoHTMLCapitulo(i, capitulo);
                 Path arquivoHTML = diretorioHTML.resolve(nomeArquivoHTML);
                 mapHtmlDoCapitulo.put(capitulo, arquivoHTML);
@@ -49,7 +49,7 @@ public class GeradorHTML implements GeradorEbook {
                         %s
                     </body>
                     </html>
-                    """.formatted(capitulo.getTitulo(), capitulo.getHtml());
+                    """.formatted(capitulo.titulo(), capitulo.html());
 
         Files.writeString(arquivoHTML, html, StandardCharsets.UTF_8);
     }
@@ -57,13 +57,13 @@ public class GeradorHTML implements GeradorEbook {
     private void escreveSumario(Ebook ebook, Path diretorioHTML, Map<Capitulo, Path> mapHtmlDoCapitulo)
             throws IOException {
 
-        String itensSumarioHtml = ebook.getCapitulos().stream()
+        String itensSumarioHtml = ebook.capitulos().stream()
                 .map(capitulo ->
                     """
                         <li>
                             <a href="%s">%s</a>
                         </li>
-                    """.formatted(mapHtmlDoCapitulo.get(capitulo).getFileName(), capitulo.getTitulo())
+                    """.formatted(mapHtmlDoCapitulo.get(capitulo).getFileName(), capitulo.titulo())
                 ).collect(Collectors.joining()
         );
 
@@ -83,7 +83,7 @@ public class GeradorHTML implements GeradorEbook {
                         </ul>
                     </body>
                     </html>
-                    """.formatted(ebook.getTitulo(), ebook.getTitulo(), ebook.getAutor(), itensSumarioHtml
+                    """.formatted(ebook.titulo(), ebook.titulo(), ebook.autor(), itensSumarioHtml
         );
 
         Path arquivoIndex =  diretorioHTML.resolve("index.html");
@@ -91,7 +91,7 @@ public class GeradorHTML implements GeradorEbook {
     }
 
     private String obterNomeArquivoHTMLCapitulo(int i, Capitulo capitulo) {
-        String tituloFormatado = capitulo.getTitulo().toLowerCase().replaceAll("\\W", "");
+        String tituloFormatado = capitulo.titulo().toLowerCase().replaceAll("\\W", "");
         return "%02d-%s.html".formatted(i, tituloFormatado);
     }
 }

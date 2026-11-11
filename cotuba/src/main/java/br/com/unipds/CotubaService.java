@@ -4,7 +4,6 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Any;
 import jakarta.enterprise.inject.Instance;
 import jakarta.inject.Inject;
-import jakarta.inject.Named;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -28,22 +27,22 @@ public class CotubaService { // Essa classe será controlada pelo CDI
 
     public void executar(ParametrosCotuba parametrosCotuba) {
 
-        Path diretorioMDs = parametrosCotuba.getDiretorioDosMD();
+        Path diretorioMDs = parametrosCotuba.diretorioDosMD();
 
-        List<Capitulo> capitulos = repositorioMarkdowns.buscarArquivosMD(diretorioMDs);
+        List<Markdown> markdowns = repositorioMarkdowns.buscarArquivosMD(diretorioMDs);
 
-        renderizadorMarkdown.renderizar(capitulos);
+        List<Capitulo> capitulos = renderizadorMarkdown.renderizar(markdowns);
 
-        var ebook = new Ebook();
+        var propriedadesEbook = leitorPropriedadesEbook.ler(diretorioMDs);
 
-        leitorPropriedadesEbook.ler(parametrosCotuba.getDiretorioDosMD(), ebook);
+        var ebook = EbookBuilder.builder()
+                .capitulos(capitulos)
+                .formato(parametrosCotuba.formato())
+                .arquivoSaida(parametrosCotuba.arquivoDeSaida())
+                .titulo(propriedadesEbook.titulo())
+                .autor(propriedadesEbook.autor()).build();
 
-        ebook.setCapitulos(capitulos);
-        ebook.setFormato(parametrosCotuba.getFormato());
-        ebook.setArquivoSaida(parametrosCotuba.getArquivoDeSaida());
-
-        FormatoEbook formato = ebook.getFormato();
-        GeradorEbook geradorEbook = geradororesEbook.select(FormatoEbookFilter.of(formato)).get();
+        GeradorEbook geradorEbook = geradororesEbook.select(FormatoEbookFilter.of(ebook.formato())).get();
 
         geradorEbook.gerar(ebook);
     }

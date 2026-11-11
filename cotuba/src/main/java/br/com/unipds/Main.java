@@ -20,12 +20,12 @@ public class Main {
             var leitorCLI = container.select(LeitorCLI.class).get();
             ParametrosCotuba parametrosCotuba = leitorCLI.ler(args);
 
-            modoVerboso = parametrosCotuba.isModoVerboso();
+            modoVerboso = parametrosCotuba.modoVerboso();
 
             var cotubaService = container.select(CotubaService.class).get();
             cotubaService.executar(parametrosCotuba);
 
-            System.out.println("Arquivo gerado com sucesso: " + parametrosCotuba.getArquivoDeSaida());
+            System.out.println("Arquivo gerado com sucesso: " + parametrosCotuba.arquivoDeSaida());
             return 0;
 
         } catch (Exception ex) {
