@@ -16,7 +16,7 @@ public class Main {
 
     int executar(String[] args) {
 
-        boolean modoVerboso = true;
+        boolean modoVerboso = false;
 
         try (SeContainer container = SeContainerInitializer.newInstance().initialize()) {
             var leitorCLI = container.select(LeitorCLI.class).get();
@@ -29,14 +29,18 @@ public class Main {
 
             System.out.println("Arquivo gerado com sucesso: " + parametrosCotuba.arquivoDeSaida());
             return 0;
-
-        } catch (Exception ex) {
-            System.err.println(ex.getMessage());
-            if (modoVerboso) {
-                System.err.println();
-                ex.printStackTrace();
-            }
-            return 1;
         }
+        catch (Exception ex) {
+          ex.printStackTrace();
+          return 1;
+        }
+//        catch (Exception ex) {
+//            System.err.println(ex.getMessage());
+//            if (modoVerboso) {
+//                System.err.println();
+//                ex.printStackTrace();
+//            }
+//            return 1;
+//        }
     }
 }

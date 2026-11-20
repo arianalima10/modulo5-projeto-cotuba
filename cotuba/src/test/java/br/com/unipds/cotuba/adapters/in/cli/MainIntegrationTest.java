@@ -56,8 +56,12 @@ class MainIntegrationTest {
         int exitCode = new Main().executar(new String[]{
                 "-d", diretorioDosMd.toString(),
                 "-f", "pdf",
-                "-o", arquivoSaida.toString()
+                "-o", arquivoSaida.toString(),
+                "-v"
         });
+
+        System.out.println("ERRO CAPTURADO:");
+        System.out.println(errContent);
 
         assertThat(exitCode).isEqualTo(0);
         assertThat(arquivoSaida).exists().isRegularFile();
