@@ -4,7 +4,7 @@ import br.com.unipds.cotuba.domain.Capitulo;
 import br.com.unipds.cotuba.domain.EbookBuilder;
 import br.com.unipds.cotuba.domain.Markdown;
 import br.com.unipds.cotuba.dto.ParametrosCotuba;
-import br.com.unipds.cotuba.plugin.CotubaPlugin;
+import br.com.unipds.cotuba.plugin.CotubaPluginAposGeracao;
 import br.com.unipds.cotuba.ports.in.CotubaUseCase;
 import br.com.unipds.cotuba.ports.out.GeradorEbook;
 import br.com.unipds.cotuba.ports.out.LeitorPropriedadesEbook;
@@ -60,7 +60,7 @@ public class CotubaService implements CotubaUseCase { // Essa classe será contr
 
         geradorEbook.gerar(ebook, parametrosCotuba.arquivoDeSaida());
 
-        for (CotubaPlugin cotubaPlugin : ServiceLoader.load(CotubaPlugin.class)) {
+        for (CotubaPluginAposGeracao cotubaPlugin : ServiceLoader.load(CotubaPluginAposGeracao.class)) {
             cotubaPlugin.aposGeracao(ebook);
         }
     }
