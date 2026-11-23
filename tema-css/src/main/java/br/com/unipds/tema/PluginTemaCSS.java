@@ -1,6 +1,5 @@
 package br.com.unipds.tema;
 
-import br.com.unipds.cotuba.domain.Ebook;
 import br.com.unipds.cotuba.plugin.CotubaPluginAposRenderizacao;
 
 public class PluginTemaCSS implements CotubaPluginAposRenderizacao {

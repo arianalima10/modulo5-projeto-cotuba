@@ -17,7 +17,7 @@
     <dependencies>
         <dependency>
             <groupId>br.com.unipds</groupId>
-            <artifactId>cotuba</artifactId>
+            <artifactId>cotuba-plugin</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
 
@@ -45,13 +45,10 @@
                             <createDependencyReducedPom>false</createDependencyReducedPom>
                             <artifactSet>
                                 <excludes>
-                                    <exclude>br.com.unipds:cotuba</exclude>
-                                    <exclude>*:commons-cli</exclude>
-                                    <exclude>*:commonmark</exclude>
-                                    <exclude>*:epubcheck-core</exclude>
-                                    <exclude>com.itextpdf:*</exclude>
+                                    <exclude>br.com.unipds:cotuba-domain</exclude>
+                                    <exclude>br.com.unipds:cotuba-plugin</exclude>
+                                    <exclude>io.soabase.record-builder:*</exclude>
                                     <exclude>org.jboss.weld.se:*</exclude>
-                                    <exclude>*:record-builder-core</exclude>
                                     <exclude>org.jmolecules:*</exclude>
                                 </excludes>
                             </artifactSet>
